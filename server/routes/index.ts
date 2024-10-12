@@ -84,7 +84,7 @@ export default defineEventHandler((event) => {
         <input class="url-copy" type="text" value="${fullHostUrl}/events" readonly onclick="this.select();" />
         <p>
             Or, download the static ICS file:
-            <a href="${fullHostUrl}/ical" download class="button">Download ICS File</a>
+            <a href="${fullHostUrl}/events" download class="button">Download ICS File</a>
         </p>
         <p class="warning">
             Note: Downloading the file is not recommended as it does not provide a live calendar subscription and won't show live data updates.
