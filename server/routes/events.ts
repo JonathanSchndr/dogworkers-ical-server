@@ -65,7 +65,7 @@ async function scrapeEvents(): Promise<any[]> {
       console.log('Link Suffix:', linkSuffix);
 
       const eventType = determineEventType(linkSuffix || '');
-      const summary = `${eventType} - ${summaryInput || title}`;
+      const summary = `${title} - ${eventType}`;
 
       console.log('Parsed Data:');
       console.log('Event Type:', eventType);

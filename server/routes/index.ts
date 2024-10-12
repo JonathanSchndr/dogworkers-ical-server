@@ -52,10 +52,9 @@ export default defineEventHandler((event) => {
                 margin-bottom: 20px;
                 font-family: monospace;
                 font-size: 0.9em;
+                width: 100%;
             }
             .github-link, .software-link {
-                margin-top: 20px;
-                display: block;
                 color: #007bff;
                 text-decoration: none;
             }
