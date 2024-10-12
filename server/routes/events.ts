@@ -3,13 +3,14 @@ import * as cheerio from 'cheerio';
 import { format } from 'date-fns';
 import { defineEventHandler } from 'h3';
 
-// Lade Umgebungsvariablen (falls nicht automatisch von Nitro unterstützt)
+// Load environment variables
 import dotenv from 'dotenv';
 dotenv.config();
 
 const portalUrl = process.env.PORTAL_URL;
+const timezone = process.env.TIMEZONE || 'UTC';
 
-// Funktion zum Abrufen des HTML-Inhalts einer gegebenen URL mit Nitro's $fetch
+// Function to fetch HTML content from a given URL using Nitro's $fetch
 async function fetchHtml(url: string): Promise<string> {
   try {
     const response = await $fetch(url);
@@ -18,23 +19,23 @@ async function fetchHtml(url: string): Promise<string> {
     }
     throw new Error('Unexpected response type received');
   } catch (error) {
-    console.error('Fehler beim Abrufen der Webseite:', error);
-    throw new Error('Fehler beim Abrufen der Webseite: ' + (error instanceof Error ? error.message : 'Unbekannter Fehler'));
+    console.error('Error fetching webpage:', error);
+    throw new Error('Error fetching webpage: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 }
 
-// Hilfsfunktion zur Bestimmung des Veranstaltungstyps aus dem linkSuffix
+// Helper function to determine the event type from the linkSuffix
 function determineEventType(suffix: string): string {
   const baseName = suffix.split('?')[0].split('/').pop()?.replace('.php', '');
   return baseName ? baseName.charAt(0).toUpperCase() + baseName.slice(1) : '';
 }
 
-// Funktion zur Korrektur des Uhrzeitformats
+// Function to correct the time format
 function correctTimeFormat(datetime: string): string {
   return datetime.replace(/(AM|PM)$/, ' $1');
 }
 
-// Funktion zum Scrapen von Event-Daten aus dem HTML
+// Function to scrape event data from HTML
 async function scrapeEvents(): Promise<any[]> {
   const currentMonth = format(new Date(), 'MM');
   const nextMonth = format(new Date().setMonth(new Date().getMonth() + 1), 'MM');
@@ -77,10 +78,10 @@ async function scrapeEvents(): Promise<any[]> {
   return events;
 }
 
-// Funktion zur Erstellung eines iCal-Feeds aus den Event-Daten
+// Function to generate an iCal feed from event data
 async function generateICalFeed(): Promise<string> {
   const events = await scrapeEvents();
-  const calendar = ical({ name: 'DogWorkers Events' });
+  const calendar = ical({ name: 'DogWorkers Events', timezone });
 
   events.forEach(event => {
     calendar.createEvent({
@@ -89,24 +90,25 @@ async function generateICalFeed(): Promise<string> {
       summary: event.summary,
       location: event.location,
       url: event.url,
+      timezone // Apply timezone to each event
     });
   });
 
   return calendar.toString();
 }
 
-// Definieren Sie den Event-Handler für die Anfrage
+// Define the event handler for the request
 export default defineEventHandler(async () => {
   try {
     const icsFeed = await generateICalFeed();
     return new Response(icsFeed, {
       headers: {
         'Content-Type': 'text/calendar',
-        'Content-Disposition': 'attachment; filename="smartfellows-events.ics"',
+        'Content-Disposition': 'attachment; filename="dogworkers-events.ics"',
       },
     });
   } catch (error) {
-    console.error('Fehler beim Erstellen des iCal-Feeds:', error);
-    return new Response('Fehler beim Erstellen des iCal-Feeds', { status: 500 });
+    console.error('Error generating iCal feed:', error);
+    return new Response('Error generating iCal feed', { status: 500 });
   }
 });
