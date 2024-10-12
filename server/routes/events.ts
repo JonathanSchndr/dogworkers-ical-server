@@ -56,20 +56,8 @@ async function scrapeEvents(): Promise<any[]> {
       const summaryInput = $(element).find('input[name="summary"]').attr('value');
       const linkSuffix = $(element).find('input[name="url"]').attr('value');
 
-      console.log('Debug: Raw Data Extracted');
-      console.log('Title:', title);
-      console.log('Start Time:', startTime);
-      console.log('End Time:', endTime);
-      console.log('Location:', location);
-      console.log('Summary Input:', summaryInput);
-      console.log('Link Suffix:', linkSuffix);
-
       const eventType = determineEventType(linkSuffix || '');
       const summary = `${title} - ${eventType}`;
-
-      console.log('Parsed Data:');
-      console.log('Event Type:', eventType);
-      console.log('Summary:', summary);
 
       if (startTime && endTime && linkSuffix) {
         const start = new Date(startTime);
@@ -92,7 +80,7 @@ async function scrapeEvents(): Promise<any[]> {
 // Funktion zur Erstellung eines iCal-Feeds aus den Event-Daten
 async function generateICalFeed(): Promise<string> {
   const events = await scrapeEvents();
-  const calendar = ical({ name: 'Smart Fellows Events' });
+  const calendar = ical({ name: 'DogWorkers Events' });
 
   events.forEach(event => {
     calendar.createEvent({
