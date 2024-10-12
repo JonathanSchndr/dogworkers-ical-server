@@ -11,6 +11,7 @@ This project provides an iCal feed for the DogWorkers dog training events. It sc
 ## Installation
 
 1. **Clone the Repository**
+
    ```bash
    git clone https://github.com/JonathanSchndr/dogworkers-ical-server.git
    cd dogworkers-ical-server
